@@ -9,6 +9,7 @@ use ai_behavior::{
 
 use interpolation::EaseFunction;
 use sprite::Sprite;
+use graphics::types::SourceRectangle;
 
 /// Animations supported by Sprite
 #[derive(Clone, PartialEq)]
@@ -65,6 +66,10 @@ pub enum Animation {
     ///
     /// Tweening the animation with ease function
     Ease(EaseFunction, Box<Animation>),
+    /// source_rectangle
+    ///
+    /// Set the sprite's source rectangle to the specified one
+    SetSrcRect(SourceRectangle),
 }
 
 impl Animation {
@@ -134,6 +139,7 @@ impl Animation {
             Ease(f, ref animation) => {
                 S::Ease(f, Box::new(animation.to_state(sprite)))
             },
+            SetSrcRect(src_rect) => S::SrcRect(src_rect),
         }
     }
 }
@@ -157,6 +163,8 @@ pub enum AnimationState {
     Fade(f64, f64, f64, f64),
     /// ease_function, animation
     Ease(EaseFunction, Box<AnimationState>),
+    /// source_rectangle
+    SrcRect(SourceRectangle),
 }
 
 impl AnimationState {
@@ -246,6 +254,10 @@ impl AnimationState {
                 } else {
                     (None, status, remain)
                 }
+            },
+            SrcRect(src_rect) => {
+                sprite.set_src_rect(src_rect);
+                (None, Success, dt)
             },
         }
     }
